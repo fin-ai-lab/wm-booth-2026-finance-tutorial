@@ -17,6 +17,10 @@ uv run jupyter lab
 Open a notebook from `notebooks/`. `uv sync` creates a local `.venv`, installs the reusable package
 in editable mode, and installs the workshop and development dependencies from the committed lockfile.
 
+The first notebook, `notebooks/01_market_jepa.ipynb`, streams its demo market data from Hugging Face
+and is configured to download the public LeJEPA encoder on first use. It does not require the
+original Market-JEPA checkout or a local market-data archive.
+
 ## Layout
 
 ```text
