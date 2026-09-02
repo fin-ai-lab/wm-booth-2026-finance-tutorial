@@ -7,11 +7,18 @@ from typing import Any
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+from matplotlib.figure import Figure
 
 from .market import FEATURE_COLUMNS
 
 
-def plot_market_sample(sample: dict[str, Any]):
+def _return_figure(figure: Figure) -> Figure:
+    """Return one rich-display figure without a second inline-backend render."""
+    plt.close(figure)
+    return figure
+
+
+def plot_market_sample(sample: dict[str, Any]) -> Figure:
     """Plot midpoint, trade VWAP, and volume from one sparse market row."""
     frame = pd.DataFrame(sample["features"], columns=FEATURE_COLUMNS)
     frame.insert(
@@ -40,10 +47,10 @@ def plot_market_sample(sample: dict[str, Any]):
     for axis in axes:
         axis.grid(alpha=0.2)
     figure.tight_layout()
-    return figure
+    return _return_figure(figure)
 
 
-def plot_dense_grid(timestamps: np.ndarray, features: np.ndarray):
+def plot_dense_grid(timestamps: np.ndarray, features: np.ndarray) -> Figure:
     """Plot the regular-hours midpoint and volume on a canonical 1 Hz grid."""
     times = pd.to_datetime(timestamps, unit="s", utc=True).tz_convert("America/New_York")
     midpoint = (features[:, 0] + features[:, 4]) / 2
@@ -57,7 +64,7 @@ def plot_dense_grid(timestamps: np.ndarray, features: np.ndarray):
     for axis in axes:
         axis.grid(alpha=0.2)
     figure.tight_layout()
-    return figure
+    return _return_figure(figure)
 
 
 def plot_views(
@@ -65,7 +72,7 @@ def plot_views(
     title: str,
     *,
     channels: tuple[str, ...] = ("vwap_all", "volume"),
-):
+) -> Figure:
     """Plot normalized channel-by-token tensors returned by an augmentation."""
     figure, axes = plt.subplots(
         len(channels),
@@ -99,10 +106,10 @@ def plot_views(
     axes[0, 0].set_title(title)
     axes[0, 0].legend(ncols=2, fontsize=8)
     figure.tight_layout()
-    return figure
+    return _return_figure(figure)
 
 
-def plot_channel_drop(pair: dict[str, Any]):
+def plot_channel_drop(pair: dict[str, Any]) -> Figure:
     """Show all channels for the two channel-drop views."""
     figure, axes = plt.subplots(1, 2, figsize=(14, 4), sharey=True)
     image = None
@@ -112,10 +119,10 @@ def plot_channel_drop(pair: dict[str, Any]):
         axis.set_xlabel("token")
         axis.set_yticks(range(len(FEATURE_COLUMNS)), FEATURE_COLUMNS)
     figure.colorbar(image, ax=axes, shrink=0.8, label="normalized value")
-    return figure
+    return _return_figure(figure)
 
 
-def plot_cross_stock(pair: dict[str, Any]):
+def plot_cross_stock(pair: dict[str, Any]) -> Figure:
     """Plot aligned stock views alongside their structured matching graph."""
     figure, axes = plt.subplots(1, 2, figsize=(13, 4.2))
     vwap_index = FEATURE_COLUMNS.index("vwap_all")
@@ -130,4 +137,4 @@ def plot_cross_stock(pair: dict[str, Any]):
     axes[1].set_xlabel("view")
     axes[1].set_ylabel("view")
     figure.tight_layout()
-    return figure
+    return _return_figure(figure)
